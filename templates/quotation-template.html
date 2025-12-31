@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Quotation - {{id}}</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    /* --- Reset --- */
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif; color: #111827; background: #fff; }
+
+    /* --- Page wrapper --- */
+    .page { width: 100%; max-width: 900px; margin: 16px auto; padding: 28px; }
+
+    /* --- Header --- */
+    .header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 18px;
+      border-radius: 10px;
+      color: white;
+      background: linear-gradient(180deg, #023A9A 0%, #1392E0 100%);
+    }
+    .brand {
+      display:flex;
+      gap:16px;
+      align-items:center;
+    }
+    .brand .logo {
+      width:72px;
+      height:72px;
+      border-radius:8px;
+      object-fit:cover;
+      background:#ffffff22;
+      display:inline-block;
+    }
+    .brand h1 { margin:0; font-size:20px; letter-spacing:0.06em; font-weight:600; }
+    .meta { text-align:right; font-size:12px; opacity:0.95; }
+
+    /* --- Summary grid --- */
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:18px; }
+    .box { background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #eef2f7; }
+    .label { font-size:11px; color:#6b7280; margin-bottom:6px; display:block; }
+    .value { font-size:14px; color:#111827; font-weight:600; }
+
+    /* --- Details --- */
+    .section { margin-top:18px; }
+    .section h3 { margin:0 0 8px 0; font-size:14px; color:#0f172a; }
+    .project-details { white-space:pre-wrap; font-size:13px; color:#374151; line-height:1.45; background:#fff; padding:12px; border-radius:8px; border:1px solid #eef2f7; }
+
+    /* --- Images --- */
+    .images { display:flex; gap:10px; margin-top:10px; flex-wrap:wrap; }
+    .images img { width:220px; height:150px; object-fit:cover; border-radius:6px; border:1px solid #e6eefb; }
+
+    /* --- Footer --- */
+    .footer {
+      margin-top:22px;
+      border-top:1px solid #eef2f7;
+      padding-top:12px;
+      font-size:12px;
+      color:#4b5563;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+    }
+
+    /* Small screens */
+    @media (max-width:600px) {
+      .grid { grid-template-columns:1fr; }
+      .images img { width:140px; height:95px; }
+      .brand h1 { font-size:18px; }
+      .page { padding:16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <div class="brand">
+        {{#if logo}}
+          <img class="logo" src="{{logo}}" alt="logo" />
+        {{else}}
+          <div class="logo"></div>
+        {{/if}}
+        <div>
+          <h1>Quotation Request</h1>
+          <div style="font-size:12px; opacity:0.92;">Maaj — Quotation ID <strong>#{{id}}</strong></div>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div>Created: {{createdAt}}</div>
+        {{#if company}}
+          <div>Company: {{company}}</div>
+        {{/if}}
+        <div style="margin-top:6px; font-weight:600;">Requested by: {{contactName}}</div>
+      </div>
+    </header>
+
+    <div class="grid" style="margin-top:18px;">
+      <div class="box">
+        <span class="label">Service Required</span>
+        <div class="value">{{serviceRequired}}</div>
+
+        <div style="height:10px"></div>
+
+        <span class="label">Project Type</span>
+        <div class="value">{{projectType}}</div>
+      </div>
+
+      <div class="box">
+        <span class="label">Estimated Area</span>
+        <div class="value">{{estimatedArea}}</div>
+
+        <div style="height:10px"></div>
+
+        <span class="label">Preferred Date</span>
+        <div class="value">{{preferredDate}}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Contact Information</h3>
+      <div style="display:flex; gap:18px; flex-wrap:wrap;">
+        <div>
+          <span class="label">Name</span>
+          <div class="value">{{contactName}}</div>
+        </div>
+        <div>
+          <span class="label">Phone</span>
+          <div class="value">{{phoneNumber}}</div>
+        </div>
+        <div>
+          <span class="label">Email</span>
+          <div class="value">{{emailAddress}}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Project Details</h3>
+      <div class="project-details">{{projectDetails}}</div>
+    </div>
+
+    {{#if images}}
+      <div class="section">
+        <h3>Attached Images</h3>
+        <div class="images">
+          {{#each images}}
+            <img src="{{this}}" alt="Attached image" />
+          {{/each}}
+        </div>
+      </div>
+    {{/if}}
+
+    <div class="footer">
+      <div>
+        <strong>Maaj</strong><br />
+        <!-- contact placeholder — you said you'll provide later -->
+      </div>
+
+      <div style="text-align:right;">
+        <div>For queries: <strong>seibrarahmad@gmail.com</strong></div>
+        <div style="font-size:11px; opacity:0.85;">Thank you for requesting a quotation.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
