@@ -70,7 +70,7 @@ export const googleCallback = async (req, res) => {
     const refreshToken = await issueRefreshToken(user, req.headers["user-agent"], req.ip);
 
     // ✅ Redirect with token in URL for frontend to read
-    res.redirect(`${process.env.FRONTEND_URL}/shop?token=${token}`);
+    res.redirect(`${config.frontendUrl}/shop?token=${token}`);
   } catch (err) {
     console.error("Google login error:", err);
     res.status(500).json({ message: "Google login failed" });
