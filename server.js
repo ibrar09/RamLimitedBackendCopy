@@ -49,6 +49,7 @@ import pdfRoutes from "./routes/pdfRoutes.js";
 import cvRoutes from "./routes/cvRoutes.js";
 import invoiceRoutes from "./routes/invoice.routes.js";
 import invoiceRequestRoutes from "./routes/invoiceRequestRoutes.js";
+import jobRoutes from "./routes/jobRoutes.js";
 
 
 // Webhook controller
@@ -117,6 +118,7 @@ app.use("/api/v1/promo-codes", promoCodeRoutes);
 app.use("/api/v1/cv", cvRoutes);
 app.use("/api/v1/invoices", invoiceRoutes);
 app.use("/api/v1/invoice-request", invoiceRequestRoutes);
+app.use("/api/v1/jobs", jobRoutes);
 
 
 // ----------------- STATIC FILES ----------------- //

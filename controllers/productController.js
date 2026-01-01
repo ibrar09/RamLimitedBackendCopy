@@ -7,6 +7,7 @@ import slugify from 'slugify';
 /* ---------------- HELPERS ---------------- */
 
 import fs from 'fs';
+import path from 'path';
 
 
 const parseJSONSafe = (value) => {
@@ -521,11 +522,35 @@ export const uploadMultiple = async (req, res) => {
     }
 
     // Fallback to local storage
+    // Fallback to local storage (Handle Memory Storage Buffers)
     console.log("📥 [Backend] uploadMultiple (Local Fallback) triggered.");
-    console.log(`📸 [Backend] Received ${files.length} files for local storage.`);
-    const imageUrls = files.map((f) => `/uploads/${f.filename}`);
-    console.log("✅ [Backend] Local upload complete:", imageUrls);
-    return res.json({ success: true, imageUrls });
+
+    const savedFiles = await Promise.all(files.map(async (f) => {
+      // If file has buffer (from memoryStorage), write it to disk
+      if (f.buffer) {
+        const timestamp = Date.now();
+        const safeName = f.originalname.replace(/[^a-zA-Z0-9.-]/g, "_");
+        const filename = `${timestamp}-${safeName}`;
+        const uploadDir = path.join(__dirname, "../uploads");
+        if (!fs.existsSync(uploadDir)) {
+          await fs.promises.mkdir(uploadDir, { recursive: true });
+        }
+        const filepath = path.join(uploadDir, filename);
+
+        await fs.promises.writeFile(filepath, f.buffer);
+        console.log(`✅ [Backend] Saved local file: ${filename}`);
+        return `/uploads/${filename}`;
+      }
+      // If file was already saved to disk (diskStorage), use filename
+      else if (f.filename) {
+        return `/uploads/${f.filename}`;
+      }
+      return null;
+    }));
+
+    const validUrls = savedFiles.filter(u => u !== null);
+    console.log("✅ [Backend] Local upload complete:", validUrls);
+    return res.json({ success: true, imageUrls: validUrls });
   } catch (err) {
     console.error("❌ [Backend] Upload error:", err);
     return res.status(500).json({ success: false, message: err.message });

@@ -11,7 +11,17 @@ if (process.env.CLOUDINARY_URL) {
         cloudinary_url: process.env.CLOUDINARY_URL,
     });
     cloudinaryConfigured = true;
+    const urlParts = process.env.CLOUDINARY_URL.split(':');
+    // Basic heuristic: keys are usually numeric. If the Key part (after // and before :) contains letters, it might be swaped.
+    // url format: cloudinary://key:secret@cloud_name
+    // part[1] ends with //, part[2] is key
+    // This is a naive regex check.
+
     console.log("✅ [Cloudinary] Configured with CLOUDINARY_URL");
+    const matches = process.env.CLOUDINARY_URL.match(/cloudinary:\/\/([^:]+):/);
+    if (matches && matches[1] && /[a-zA-Z]/.test(matches[1])) {
+        console.warn("⚠️ [Cloudinary] WARNING: Your Cloudinary API Key contains letters. You may have swapped API Key and Secret!");
+    }
 }
 // Option 2: Use individual credentials
 else if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {

@@ -40,6 +40,7 @@ import ProjectInvestmentModel from "./ProjectInvestment.js";
 import InvestmentFeatureModel from "./InvestmentFeature.js";
 import ProjectChallengeSolutionModel from "./ProjectChallengeSolution.js";
 import InvoiceRequestModel from "./InvoiceRequest.js";
+import JobModel from "./Job.js";
 
 // ✅ New OTP & Session Models
 import OtpModel from "./Otp.js";
@@ -131,6 +132,7 @@ const CartItem = CartItemModel(sequelize); // ✅ singular
 const CV = CVModel(sequelize)
 const Invoice = InvoiceModel(sequelize);
 const InvoiceRequest = InvoiceRequestModel(sequelize)
+const Job = JobModel(sequelize);
 
 
 console.log("✅ All models initialized successfully");
@@ -259,6 +261,10 @@ User.hasMany(Otp, { foreignKey: "user_id", onDelete: "CASCADE" });
 Otp.belongsTo(User, { foreignKey: "user_id" });
 User.hasMany(Session, { foreignKey: "user_id", onDelete: "CASCADE" });
 Session.belongsTo(User, { foreignKey: "user_id" });
+
+// Jobs & CVs
+Job.hasMany(CV, { foreignKey: "job_id", as: "applications" });
+CV.belongsTo(Job, { foreignKey: "job_id", as: "job" });
 
 // ------------------ CartItem Associations ------------------ //
 CartItem.belongsTo(Product, { foreignKey: "product_id" });
@@ -389,4 +395,5 @@ export {
   CV,
   Invoice,
   InvoiceRequest,
+  Job,
 };

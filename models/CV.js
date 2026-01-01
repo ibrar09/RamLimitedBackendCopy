@@ -10,6 +10,14 @@ export default (sequelize) => {
         autoIncrement: true,
         primaryKey: true,
       },
+      job_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true, // Nullable for general applications
+        references: {
+          model: 'jobs',
+          key: 'id'
+        }
+      },
       name: {
         type: DataTypes.STRING,
         allowNull: false,
