@@ -14,6 +14,7 @@ const config = {
 
   // Database Configuration
   db: {
+    url: process.env.DATABASE_URL || null,
     username: process.env.DB_USER || "postgres",
     password: process.env.DB_PASSWORD || "",
     database: process.env.DB_NAME || "webdb",

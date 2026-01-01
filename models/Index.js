@@ -50,16 +50,18 @@ const dbConfig = config.db;
 
 if (!dbConfig) throw new Error(`No database configuration found in config.js`);
 
-const sequelize = new Sequelize(
-  dbConfig.database,
-  dbConfig.username,
-  dbConfig.password,
-  {
-    host: dbConfig.host,
-    dialect: dbConfig.dialect,
+const sequelize = dbConfig.url
+  ? new Sequelize(dbConfig.url, {
     logging: false,
     timezone: "+03:00",
     dialectOptions: {
+      // SSL is often required for cloud databases
+      ...(process.env.NODE_ENV === "production" && {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false
+        }
+      }),
       useUTC: false,
       dateStrings: true,
       typeCast: true,
@@ -68,8 +70,27 @@ const sequelize = new Sequelize(
       timestamps: true,
       underscored: false,
     },
-  }
-);
+  })
+  : new Sequelize(
+    dbConfig.database,
+    dbConfig.username,
+    dbConfig.password,
+    {
+      host: dbConfig.host,
+      dialect: dbConfig.dialect,
+      logging: false,
+      timezone: "+03:00",
+      dialectOptions: {
+        useUTC: false,
+        dateStrings: true,
+        typeCast: true,
+      },
+      define: {
+        timestamps: true,
+        underscored: false,
+      },
+    }
+  );
 
 // ------------------ Initialize Models ------------------ //
 const User = UserModel(sequelize);
