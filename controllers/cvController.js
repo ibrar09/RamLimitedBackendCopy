@@ -1,4 +1,4 @@
-import { CV } from "../models/Index.js"; // ✅ CV model
+import { CV } from "../models/index.js"; // ✅ CV model
 import path from "path";
 import fs from "fs";
 import { transporter, mailOptionsBase } from "../services/mailer.js"; // your existing email setup

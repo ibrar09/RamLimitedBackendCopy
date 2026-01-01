@@ -1,6 +1,6 @@
 // services/cvService.js
 
-import db from "../models/Index.js"; // all lowercase
+import db from "../models/index.js"; // all lowercase
 
 const CV = db.CV;
 
