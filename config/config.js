@@ -70,7 +70,11 @@ const requiredVars = [
 
 requiredVars.forEach((varName) => {
   if (!process.env[varName] && config.env === "production") {
-    console.warn(`[WARNING]: Environment variable ${varName} is missing in production!`);
+    // Only warn if it's not a DB variable OR if DATABASE_URL is also missing
+    const isDbVar = ["DB_USER", "DB_PASSWORD", "DB_NAME"].includes(varName);
+    if (!isDbVar || !config.db.url) {
+      console.warn(`[WARNING]: Environment variable ${varName} is missing in production!`);
+    }
   }
 });
 
