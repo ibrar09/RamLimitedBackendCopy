@@ -5,16 +5,20 @@ import bcrypt from "bcrypt";
 import { User, Otp, Session } from "../models/index.js";
 import { sendOtpEmail } from "../utils/email.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
+import config from "../config/config.js";
 
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "refreshsecret";
+const JWT_SECRET = config.jwt.secret;
+const JWT_REFRESH_SECRET = config.jwt.refreshSecret;
 
 // ------------------- GOOGLE LOGIN -------------------
 export const googleLogin = (req, res) => {
   const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
+  const redirectUri = config.google.redirectUri;
+  console.log("🔗 [Google Auth] Starting login. Redirect URI:", redirectUri);
+
   const options = {
-    redirect_uri: process.env.GOOGLE_REDIRECT_URI,
-    client_id: process.env.GOOGLE_CLIENT_ID,
+    redirect_uri: redirectUri,
+    client_id: config.google.clientId,
     access_type: "offline",
     response_type: "code",
     prompt: "consent",
@@ -31,14 +35,15 @@ export const googleLogin = (req, res) => {
 // ------------------- GOOGLE CALLBACK -------------------
 export const googleCallback = async (req, res) => {
   const code = req.query.code;
+  const redirectUri = config.google.redirectUri;
   try {
     const { data } = await axios.post(
       "https://oauth2.googleapis.com/token",
       new URLSearchParams({
         code,
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+        client_id: config.google.clientId,
+        client_secret: config.google.clientSecret,
+        redirect_uri: redirectUri,
         grant_type: "authorization_code",
       }),
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
@@ -116,7 +121,7 @@ export const registerUser = async (req, res) => {
       role,
     });
 
-    const generatedOtp = Math.floor(100000 + Math.random() * 900000); 
+    const generatedOtp = Math.floor(100000 + Math.random() * 900000);
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     await Otp.create({
