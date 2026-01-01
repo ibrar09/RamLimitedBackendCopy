@@ -67,7 +67,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: config.frontendUrl,
+    origin: config.frontendUrl.replace(/\/$/, ''), // Remove trailing slash
     credentials: true,
   })
 );
