@@ -150,7 +150,6 @@ router.get("/slug/:slug", getProductBySlug);
  *                 items:
  *                   type: string
  *                   format: binary
-// Removed invalid commented-out Swagger lines
  *               color:
  *                 type: string
  *               size:

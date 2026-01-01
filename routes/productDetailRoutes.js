@@ -31,9 +31,6 @@ const router = express.Router();
  *             required:
  *               - product_id
  *             properties:
- *               product_id:
- *                 type: integer
-// Removed invalid commented-out Swagger lines
  *               color:
  *                 type: string
  *               size:
