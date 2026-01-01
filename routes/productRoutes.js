@@ -18,17 +18,23 @@ const router = express.Router();
 console.log("🛠️ [Backend] Initializing productRoutes...");
 
 /* ------------------- MULTER CONFIG ------------------- */
-const storage = multer.diskStorage({
+// Use memory storage for Cloudinary (stores files in buffer)
+// Falls back to disk storage if Cloudinary fails
+const memoryStorage = multer.memoryStorage();
+const diskStorage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
-const upload = multer({ storage });
+
+// Use memory storage for upload route (Cloudinary needs buffer)
+const uploadMemory = multer({ storage: memoryStorage });
+const uploadDisk = multer({ storage: diskStorage });
 
 // ✅ Hybrid storage fallback route - Moved to top for priority
 router.post("/upload-multiple", (req, res, next) => {
   console.log("🔗 [Backend] Route hit: POST /api/v1/products/upload-multiple");
   next();
-}, upload.array("images"), uploadMultiple);
+}, uploadMemory.array("images"), uploadMultiple);
 
 
 /* ------------------- PARSE KEY FEATURES MIDDLEWARE ------------------- */

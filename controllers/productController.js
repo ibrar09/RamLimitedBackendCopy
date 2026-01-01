@@ -474,15 +474,60 @@ export const getProductBySlug = async (req, res) => {
 };
 
 /* ---------------- UPLOAD MULTIPLE (HELPER FOR HYBRID) ---------------- */
+import { cloudinary, cloudinaryConfigured } from "../config/cloudinary.js";
+
 export const uploadMultiple = async (req, res) => {
   try {
-    console.log("📥 [Backend] uploadMultiple (Fallback) triggered.");
     const files = req.files || [];
+
+    if (files.length === 0) {
+      return res.status(400).json({ success: false, message: "No files uploaded" });
+    }
+
+    console.log(`📸 [Backend] Received ${files.length} files for upload.`);
+
+    // Try Cloudinary first if configured
+    if (cloudinaryConfigured) {
+      try {
+        console.log("☁️ [Backend] Uploading to Cloudinary...");
+        const uploadPromises = files.map((file) => {
+          return new Promise((resolve, reject) => {
+            const uploadStream = cloudinary.uploader.upload_stream(
+              {
+                folder: "products",
+                resource_type: "auto",
+              },
+              (error, result) => {
+                if (error) {
+                  console.error("❌ [Cloudinary] Upload error:", error);
+                  reject(error);
+                } else {
+                  console.log("✅ [Cloudinary] Uploaded:", result.secure_url);
+                  resolve(result.secure_url);
+                }
+              }
+            );
+            uploadStream.end(file.buffer);
+          });
+        });
+
+        const imageUrls = await Promise.all(uploadPromises);
+        console.log("✅ [Backend] All images uploaded to Cloudinary");
+        return res.json({ success: true, imageUrls });
+      } catch (cloudinaryError) {
+        console.error("❌ [Backend] Cloudinary upload failed, falling back to local:", cloudinaryError);
+        // Fall through to local storage
+      }
+    }
+
+    // Fallback to local storage
+    console.log("📥 [Backend] uploadMultiple (Local Fallback) triggered.");
     console.log(`📸 [Backend] Received ${files.length} files for local storage.`);
     const imageUrls = files.map((f) => `/uploads/${f.filename}`);
     console.log("✅ [Backend] Local upload complete:", imageUrls);
     return res.json({ success: true, imageUrls });
   } catch (err) {
+    console.error("❌ [Backend] Upload error:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };
