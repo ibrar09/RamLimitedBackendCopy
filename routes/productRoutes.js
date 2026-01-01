@@ -176,7 +176,7 @@ router.get("/slug/:slug", getProductBySlug);
  *       201:
  *         description: Product created successfully
  */
-router.post("/", upload.array("images"), parseKeyFeatures, createProduct);
+router.post("/", uploadMemory.array("images"), parseKeyFeatures, createProduct);
 
 /**
  * @swagger
@@ -255,7 +255,7 @@ router.post("/", upload.array("images"), parseKeyFeatures, createProduct);
  *       404:
  *         description: Product not found
  */
-router.put("/:id", upload.array("images"), parseKeyFeatures, updateProduct);
+router.put("/:id", uploadMemory.array("images"), parseKeyFeatures, updateProduct);
 
 /**
  * @swagger
