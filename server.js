@@ -57,6 +57,9 @@ import { tapWebhook } from "./controllers/webhookController.js";
 // ----------------- PASSPORT ----------------- //
 import "./config/passport.js";
 
+// ----------------- FIREBASE ADMIN ----------------- //
+import "./config/firebase-admin.js";
+
 // ----------------- APP INIT ----------------- //
 const app = express();
 
