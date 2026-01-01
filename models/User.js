@@ -8,7 +8,7 @@ export default (sequelize) => {
       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       name: { type: DataTypes.STRING, allowNull: false },
       email: { type: DataTypes.STRING, allowNull: false, unique: true },
-      password: { type: DataTypes.STRING(100) ,allowNull:true},
+      password: { type: DataTypes.STRING(100), allowNull: true },
       phone: { type: DataTypes.STRING },
       role: { type: DataTypes.STRING, defaultValue: "user" },
       status: { type: DataTypes.STRING, defaultValue: "active" },
@@ -21,15 +21,15 @@ export default (sequelize) => {
       otpExpires: { type: DataTypes.DATE, field: "otpExpires" },
     },
     {
-       tableName: "users",
+      tableName: "users",
       timestamps: true,           // Sequelize will now manage createdAt/updatedAt
       createdAt: "created_at",    // map createdAt → created_at
       updatedAt: "updated_at",    // map updatedAt → updated_at
-      underscored: true, 
+      underscored: true,
     }
   );
 
   // Password hashing
- 
+
   return User;
 };

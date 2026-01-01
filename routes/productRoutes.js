@@ -9,10 +9,13 @@ import {
   deleteProduct,
   searchProducts,
   getProductBySlug,
+  uploadMultiple,
 } from "../controllers/productController.js";
 import { exportProductsPdf } from "../controllers/productPdfController.js";
 
 const router = express.Router();
+
+console.log("🛠️ [Backend] Initializing productRoutes...");
 
 /* ------------------- MULTER CONFIG ------------------- */
 const storage = multer.diskStorage({
@@ -20,6 +23,13 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
 const upload = multer({ storage });
+
+// ✅ Hybrid storage fallback route - Moved to top for priority
+router.post("/upload-multiple", (req, res, next) => {
+  console.log("🔗 [Backend] Route hit: POST /api/v1/products/upload-multiple");
+  next();
+}, upload.array("images"), uploadMultiple);
+
 
 /* ------------------- PARSE KEY FEATURES MIDDLEWARE ------------------- */
 const parseKeyFeatures = (req, res, next) => {
@@ -261,6 +271,8 @@ router.put("/:id", upload.array("images"), parseKeyFeatures, updateProduct);
  *         description: Product not found
  */
 router.delete("/:id", deleteProduct);
+
+// Route moved to top
 
 
 router.post("/products/pdf", exportProductsPdf);

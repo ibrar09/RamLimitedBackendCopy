@@ -1,5 +1,5 @@
-import { User ,UserAddress } from "../models/index.js";
-import bcrypt from "bcryptjs";
+import { User, UserAddress } from "../models/index.js";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const createUser = async ({ name, email, password, phone }) => {
@@ -8,15 +8,15 @@ export const createUser = async ({ name, email, password, phone }) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = await User.create({ 
-    name, 
-    email, 
-    password: hashedPassword, 
+  const user = await User.create({
+    name,
+    email,
+    password: hashedPassword,
     phone,
     role: "user", // Default role for new users
     status: "active"
   });
-  
+
   // Return user without password
   const userWithoutPassword = {
     id: user.id,
@@ -27,20 +27,20 @@ export const createUser = async ({ name, email, password, phone }) => {
     status: user.status,
     created_at: user.created_at
   };
-  
+
   return userWithoutPassword;
 };
 
 export const loginUserService = async ({ email, password }) => {
   try {
     console.log(`🔍 Attempting login for email: ${email}`);
-    
+
     // Find user with all attributes
-    const user = await User.findOne({ 
+    const user = await User.findOne({
       where: { email },
       attributes: ['id', 'name', 'email', 'password', 'phone', 'role', 'status', 'created_at']
     });
-    
+
     if (!user) {
       console.log(`❌ Login failed: No user found with email: ${email}`);
       throw new Error("Invalid email or password");
@@ -48,7 +48,7 @@ export const loginUserService = async ({ email, password }) => {
 
     console.log(`✅ User found:`, {
       id: user.id,
-      email: user.email, 
+      email: user.email,
       role: user.role,
       status: user.status
     });
@@ -62,7 +62,7 @@ export const loginUserService = async ({ email, password }) => {
     // Verify password
     console.log(`🔐 Comparing password...`);
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    
+
     if (!isPasswordValid) {
       console.log(`❌ Login failed: Invalid password for user: ${email}`);
       throw new Error("Invalid email or password");
@@ -72,12 +72,12 @@ export const loginUserService = async ({ email, password }) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { 
-        id: user.id, 
+      {
+        id: user.id,
         role: user.role,
         email: user.email
-      }, 
-      process.env.JWT_SECRET || "your_jwt_secret", 
+      },
+      process.env.JWT_SECRET || "your_jwt_secret",
       { expiresIn: "7d" }
     );
 
@@ -93,10 +93,10 @@ export const loginUserService = async ({ email, password }) => {
     };
 
     console.log(`🎉 Login successful for: ${email} (Role: ${user.role})`);
-    
-    return { 
-      user: userWithoutPassword, 
-      token 
+
+    return {
+      user: userWithoutPassword,
+      token
     };
 
   } catch (error) {
@@ -140,7 +140,7 @@ export const getAllUsersService = async () => {
 export const createAdminUser = async () => {
   try {
     const adminEmail = "admin@maaj.com";
-    
+
     // Check if admin already exists
     const existingAdmin = await User.findOne({ where: { email: adminEmail } });
     if (existingAdmin) {

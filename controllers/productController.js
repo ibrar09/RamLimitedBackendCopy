@@ -163,6 +163,7 @@ export const getProductById = async (req, res) => {
 /* ---------------- CREATE PRODUCT ---------------- */
 export const createProduct = async (req, res) => {
   try {
+    console.log("📝 [Backend] createProduct request received.");
     const {
       name,
       description,
@@ -190,7 +191,14 @@ export const createProduct = async (req, res) => {
     } = req.body;
 
     const files = req.files || [];
-    const uploadedImages = files.map((f) => `/uploads/${f.filename}`);
+    const localUploadedImages = files.map((f) => `/uploads/${f.filename}`);
+
+    // Support hybrid image URLs (e.g., from Firebase)
+    let finalImages = [...localUploadedImages];
+    if (req.body.image_urls) {
+      const incomingUrls = parseJSONSafe(req.body.image_urls);
+      finalImages = [...finalImages, ...incomingUrls];
+    }
 
     if (!name || !price || !category_id || !brand_id) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
@@ -219,7 +227,7 @@ export const createProduct = async (req, res) => {
       sku,
       subcategory,
       subcategory_ar,
-      image_urls: JSON.stringify(uploadedImages),
+      image_urls: JSON.stringify(finalImages),
       key_features: JSON.stringify(key_features || []),
       status,
       is_new_release: normalizeBool(is_new_release),
@@ -263,20 +271,17 @@ export const updateProduct = async (req, res) => {
     /* ---------------- IMAGES ---------------- */
 
     const files = req.files || [];
-    const uploadedImages = files.map((f) => `/uploads/${f.filename}`);
+    const localUploadedImages = files.map((f) => `/uploads/${f.filename}`);
+    const existingImages = parseJSONSafe(product.image_urls);
 
-    let existingImages = [];
-    try {
-      existingImages = JSON.parse(product.image_urls || "[]");
-    } catch {
-      existingImages = [];
+    // ✅ Merge old + new local images + incoming remote URLs
+    let finalImages = [...existingImages, ...localUploadedImages];
+    if (req.body.image_urls) {
+      const incomingUrls = parseJSONSafe(req.body.image_urls);
+      // Avoid duplication if they are already in existing
+      const newUnique = incomingUrls.filter(u => !existingImages.includes(u));
+      finalImages = [...finalImages, ...newUnique];
     }
-
-    // ✅ Merge old + new images
-    const finalImages =
-      uploadedImages.length > 0
-        ? [...existingImages, ...uploadedImages]
-        : existingImages;
 
     /* ---------------- BODY ---------------- */
 
@@ -468,3 +473,16 @@ export const getProductBySlug = async (req, res) => {
   }
 };
 
+/* ---------------- UPLOAD MULTIPLE (HELPER FOR HYBRID) ---------------- */
+export const uploadMultiple = async (req, res) => {
+  try {
+    console.log("📥 [Backend] uploadMultiple (Fallback) triggered.");
+    const files = req.files || [];
+    console.log(`📸 [Backend] Received ${files.length} files for local storage.`);
+    const imageUrls = files.map((f) => `/uploads/${f.filename}`);
+    console.log("✅ [Backend] Local upload complete:", imageUrls);
+    return res.json({ success: true, imageUrls });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};

@@ -39,8 +39,10 @@ export const createBanner = async (req, res) => {
   try {
     const data = req.body;
 
-    // If image was uploaded, save URL
-    if (req.file) data.image_url = `/uploads/${req.file.filename}`;
+    // If image was uploaded, save URL (overriding body if necessary, but supporting both)
+    if (req.file) {
+      data.image_url = `/uploads/${req.file.filename}`;
+    }
 
     const banner = await bannerService.createBanner(data);
     res.status(201).json({ success: true, data: banner });

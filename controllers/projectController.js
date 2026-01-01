@@ -50,19 +50,31 @@ export const createProjectController = async (req, res) => {
     console.log("🖼️ req.files:", req.files);
 
     // Handle main image
-    const mainImagePath = req.files?.image?.[0]
+    let mainImagePath = req.files?.image?.[0]
       ? `/uploads/${req.files.image[0].filename}`
-      : null;
+      : req.body.image || null;
 
     // Handle testimonial image
-    const testimonialImagePath = req.files?.testimonialImage?.[0]
+    let testimonialImagePath = req.files?.testimonialImage?.[0]
       ? `/uploads/${req.files.testimonialImage[0].filename}`
-      : null;
+      : req.body.testimonialImage || null;
 
     // Handle gallery images
-    const galleryImagesPaths = req.files?.images
+    let galleryImagesPaths = req.files?.images
       ? req.files.images.map((file) => `/uploads/${file.filename}`)
       : [];
+
+    // Support hybrid gallery URLs from body
+    if (req.body.images) {
+      try {
+        const incomingGallery = typeof req.body.images === 'string' ? JSON.parse(req.body.images) : req.body.images;
+        if (Array.isArray(incomingGallery)) {
+          galleryImagesPaths = [...galleryImagesPaths, ...incomingGallery];
+        }
+      } catch (err) {
+        console.warn("Failed to parse gallery images from body:", err);
+      }
+    }
 
     // Build project data
     const data = {
@@ -127,9 +139,18 @@ export const updateProjectController = async (req, res) => {
       ? `/uploads/${req.files.image[0].filename}`
       : req.body.image || null;
 
-    const images = req.files?.images
+    let images = req.files?.images
       ? req.files.images.map((file) => `/uploads/${file.filename}`)
-      : req.body.images || [];
+      : [];
+
+    if (req.body.images) {
+      try {
+        const incomingGallery = typeof req.body.images === 'string' ? JSON.parse(req.body.images) : req.body.images;
+        if (Array.isArray(incomingGallery)) {
+          images = [...images, ...incomingGallery];
+        }
+      } catch (e) { }
+    }
 
     const testimonialImage = req.files?.testimonialImage?.[0]
       ? `/uploads/${req.files.testimonialImage[0].filename}`
